@@ -4,41 +4,61 @@ import sys
 from random import random
 import math
 
-filename = "c:\Lab\labview_playing\MOTConf.csv"
-rate = 20000
-configfile = open(filename, 'r')
+#infilename = "c:\Lab\waveform\MOTConf.csv"
+#rate = 20000
+# loopnum = 0
+configfile = open(infilename, 'r')
 conf = [line.strip().split(',') for line in configfile.readlines()]
 
-def parsesetting(conf, rate, totalt):
-    global numpy, math
+# These are the ramp functions we know about
+funcchoose = {0: 'linear',
+              3: 'adiabatic',
+              4: 'exponential',
+              5: 'linear',
+              6: 'sine',
+              }
+
+def parsesetting(conf, rate, totalt, loopnum):
+    """ Parse settings from configuration file
+
+    Input:
+    conf:
+    rate:
+    totalt:
+    loopnum:
+
+    Output:
+    values:
+
+    """
+    global numpy, math, funcchoose
     cp = numpy.array([float(val)/1000 for val in conf[0] if val != ''])
     ncp = len(cp)
     ct = numpy.array([float(val)/1000 for val in conf[1][:ncp]])
     cv = numpy.array([float(val) for val in conf[2][:ncp]])
-    special = numpy.array([int(val) for val in conf[6][:ncp]])
     
+    dcp = numpy.array([float(val)/1000 for val in conf[3][:ncp]]) 
+    dct = numpy.array([float(val)/1000 for val in conf[4][:ncp]]) 
+    dcv = numpy.array([float(val)/1000 for val in conf[5][:ncp]]) 
+
+    special = numpy.array([int(val) for val in conf[6][:ncp]])
+
+    cp += loopnum * dcp
     changes = []
     for i in range(ncp):
-        vprev = cv[i-1]
-        vthis = cv[i]
-        timescale = ct[i]
+        vprev = cv[i-1] + loopnum * dcv[i-1]
+        vthis = cv[i] + loopnum * dcv[i]
+        timescale = ct[i] + loopnum * dct[i]
         if timescale == 0 or (i == ncp-1):
             changes += [[vthis]]
         else:
             intervals = int(timescale * rate)  # implicit rounding down
             tsteps = numpy.linspace(0, intervals/rate, intervals + 1)
-            funcchoose = {3: 'adiabatic',
-                          4: 'exponential',
-                          5: 'linear',
-                          6: 'sinne',
-                          }
+
             try:
                 funcshape = funcchoose[special[i]]
             except KeyError:
-                funcshape = funcchoose[5]
-
-            # For testing
-            funcshape = 'linear'
+                raise NotImplemented
 
             if funcshape == 'adiabatic':
                 raise NotImplemented
@@ -77,7 +97,18 @@ def parsesetting(conf, rate, totalt):
         values += [newval]
     return numpy.array(values)
 
-def parseconfig(conf, rate):
+def parseconfig(conf, rate, loopnum):
+    """ Parse the total configutation file
+
+    Input
+    conf:
+    rate:
+    loopnum:
+
+    Output
+    result: waveforms
+
+    """
     global parsesetting, math
 
     ch1n = int(conf[0][0])
@@ -92,17 +123,17 @@ def parseconfig(conf, rate):
 
     for i in range(ch1n):
         idx = ch1start + i * nparam
-        values = parsesetting(conf[idx:idx+nparam], rate, totalt)
+        values = parsesetting(conf[idx:idx+nparam], rate, totalt, loopnum)
         result[i] = list(values)
     for i in range(ch2n):
         idx = ch2start + i * nparam
-        values = parsesetting(conf[idx:idx+nparam], rate, totalt)
+        values = parsesetting(conf[idx:idx+nparam], rate, totalt, loopnum)
         result[ch1n+i] = list(values)
 
     return result
     
 # Return variable
-result = parseconfig(conf, rate)
+result = parseconfig(conf, rate, loopnum)
 out = result
 
 # import pylab as pl
