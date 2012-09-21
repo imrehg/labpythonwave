@@ -4,6 +4,10 @@ import sys
 from random import random
 import math
 
+# From http://pypi.python.org/pypi/percache
+import percache
+cache = percache.Cache("c:\Lab\waveform\cache")
+
 try:  # if these succeeds, we are running inside LabPython
     infilename
     rate
@@ -27,6 +31,7 @@ funcchoose = {0: 'linear',
               6: 'sine',
               }
 
+@cache
 def parsesetting(conf, rate, loopnum):
     """ Parse settings from configuration file
 
@@ -169,6 +174,10 @@ def parseconfig(conf, rate, loopnum):
 # Return variable
 result = parseconfig(conf, rate, loopnum)
 out = result
+
+# finish up
+cache.clear(maxage=72*60*60)
+cache.close()
 
 if not LabPython:
     import pylab as pl
