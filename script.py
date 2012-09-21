@@ -51,6 +51,7 @@ def parsesetting(conf, rate, totalt, loopnum):
     dcv = numpy.array([float(val)/1000 for val in conf[5][:ncp]]) 
 
     special = numpy.array([int(val) for val in conf[6][:ncp]])
+    reserve = numpy.array([int(val) for val in conf[7][:ncp]])
 
     cp += loopnum * dcp
     changes = []
@@ -76,7 +77,8 @@ def parsesetting(conf, rate, totalt, loopnum):
             elif funcshape == 'exponential':
                 raise NotImplementedError("Exponential time dependence")
             elif funcshape == 'sine':
-                raise NotImplementedError("Sine time dependence")
+                amplitude = reserve[i] / 2
+                vals = amplitude * numpy.sin(2 * numpy.pi * tsteps / tsteps[-1]) + vthis
             elif funcshape == 'linear':
                 vals = (vthis - vprev) * tsteps / timescale + vprev
             else:
