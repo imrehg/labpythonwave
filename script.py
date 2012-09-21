@@ -81,8 +81,14 @@ def parsesetting(conf, rate, loopnum):
             elif funcshape == 'exponential':
                 raise NotImplementedError("Exponential time dependence")
             elif funcshape == 'sine':
-                amplitude = reserve[i] / 2
-                vals = amplitude * numpy.sin(2 * numpy.pi * tsteps / tsteps[-1]) + vthis
+                params = reserve[i]
+
+                deltaamp = params[2]
+                deltafreq = params[3]
+                amplitude = params[0] + loopnum * deltaamp
+                freq = params[1] + loopnum * deltafreq
+
+                vals = 0.5 * amplitude * numpy.sin(2 * numpy.pi * tsteps * freq) + vthis
             elif funcshape == 'linear':
                 vals = (vthis - vprev) * tsteps / timescale + vprev
             else:
