@@ -70,7 +70,9 @@ def parsesetting(conf, rate, totalt, loopnum):
                 raise NotImplementedError("Time dependence: %d" %special[i])
 
             if funcshape == 'adiabatic':
-                raise NotImplementedError("Adiabatic time dependence")
+                A, B = numpy.power([vprev, vthis], -0.5)
+                a = (A - B) / timescale
+                vals = 1 / (A - a * tsteps)**2
             elif funcshape == 'exponential':
                 raise NotImplementedError("Exponential time dependence")
             elif funcshape == 'sine':
