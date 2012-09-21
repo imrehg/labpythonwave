@@ -27,7 +27,7 @@ funcchoose = {0: 'linear',
               6: 'sine',
               }
 
-def parsesetting(conf, rate, totalt, loopnum):
+def parsesetting(conf, rate, loopnum):
     """ Parse settings from configuration file
 
     Input:
@@ -54,12 +54,14 @@ def parsesetting(conf, rate, totalt, loopnum):
     reserve = numpy.array([int(val) for val in conf[7][:ncp]])
 
     cp += loopnum * dcp
+    totalt = cp[-1] + ct[-1]  # the last interval plus change
+
     changes = []
     for i in range(ncp):
         vprev = cv[i-1] + loopnum * dcv[i-1]
         vthis = cv[i] + loopnum * dcv[i]
         timescale = ct[i] + loopnum * dct[i]
-        if timescale == 0 or (i == ncp-1):
+        if timescale == 0:
             changes += [[vthis]]
         else:
             intervals = int(timescale * rate)  # implicit rounding down
@@ -96,7 +98,7 @@ def parsesetting(conf, rate, totalt, loopnum):
     counter = 0
     values = []
     for t in tlist:
-        if t >= cp[icp + 1]:
+        if icp < (ncp-1) and t >= cp[icp + 1]:
             icp += 1
             counter = 0
 
@@ -128,21 +130,27 @@ def parseconfig(conf, rate, loopnum):
     ch1n = int(conf[0][0])
     ch2n = int(conf[0][1])
     nparam = int(conf[0][2])
-    totalt = float(conf[0][3]) / 1000
     ch1start = 2
     ch2start = ch1start + ch1n*nparam + 1
 
-    intervals = int(math.ceil(totalt * rate))
+    # intervals = int(math.ceil(totalt * rate))
     result = [[]] * (ch1n + ch2n)
 
+    maxlength = -1
     for i in range(ch1n):
         idx = ch1start + i * nparam
-        values = parsesetting(conf[idx:idx+nparam], rate, totalt, loopnum)
+        values = parsesetting(conf[idx:idx+nparam], rate, loopnum)
         result[i] = list(values)
+        maxlength = max(len(values), maxlength)
     for i in range(ch2n):
         idx = ch2start + i * nparam
-        values = parsesetting(conf[idx:idx+nparam], rate, totalt, loopnum)
+        values = parsesetting(conf[idx:idx+nparam], rate, loopnum)
         result[ch1n+i] = list(values)
+        maxlength = max(len(values), maxlength)
+
+    # Equalize the results' length
+    for i in range(len(result)):
+        result[i] += [result[i][-1]] * (maxlength - len(result[i]))
 
     return result
     
