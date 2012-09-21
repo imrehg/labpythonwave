@@ -11,10 +11,16 @@ Have to supply the path to the script and to the CSV file.
 
 ## Install
 
+Software to install:
+
 * [Python][python] (2.7.3 at the moment, 32-bit) and [Numpy][numpy] (1.7.0).
-* [VI Package Manager][vipm], or could 
-* [OpenG][openg] (from within the VI Package Manager)
+* [VI Package Manager][vipm], from its homepage or from the NI website
 * [LabPython][labpython] (from within the VI Package Manager)
+* [OpenG][openg] (optional) (from within the VI Package Manager)
+
+Settings:
+
+* Use "PYTHON Set Server Path" sub-VI to set the correct path, usually: `C:\Windows\System32\python27.dll`
 
 ## Known issues
 
