@@ -86,6 +86,7 @@ def parsesetting(conf, rate, totalt, loopnum):
 
             if tsteps[-1] < timescale:
                 vals = numpy.append(vals, vthis)
+            vals = numpy.append(vals, vthis)
             changes += [list(vals)]
 
     intervals = int(math.ceil(totalt * rate))
