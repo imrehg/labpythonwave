@@ -51,7 +51,9 @@ def parsesetting(conf, rate, loopnum):
     dcv = numpy.array([float(val)/1000 for val in conf[5][:ncp]]) 
 
     special = numpy.array([int(val) for val in conf[6][:ncp]])
-    reserve = numpy.array([int(val) for val in conf[7][:ncp]])
+    reserve = [val for val in conf[7][:ncp]]
+    for i in range(len(reserve)):
+        reserve[i] = [float(part) for part in reserve[i].split(';')]
 
     cp += loopnum * dcp
     totalt = cp[-1] + ct[-1]  # the last interval plus change
