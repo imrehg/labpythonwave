@@ -4,9 +4,18 @@ import sys
 from random import random
 import math
 
-#infilename = "c:\Lab\waveform\MOTConf.csv"
-#rate = 20000
-# loopnum = 0
+try:  # if these succeeds, we are running inside LabPython
+    infilename
+    rate
+    loopnum
+    LabPython = True
+except NameError:  # if this happens, we are running as a stand-alone script
+    infilename = "c:\Lab\waveform\MOTConf.csv"
+    rate = 20000
+    loopnum = 0
+    LabPython = False
+
+
 configfile = open(infilename, 'r')
 conf = [line.strip().split(',') for line in configfile.readlines()]
 
@@ -136,12 +145,13 @@ def parseconfig(conf, rate, loopnum):
 result = parseconfig(conf, rate, loopnum)
 out = result
 
-# import pylab as pl
-# ntimes = len(result[0])
-# times = numpy.linspace(0, (ntimes-1) / rate, ntimes)
-# for i in range(len(result)):
-#     pl.plot(times, result[i], label='Ch %d' %(i))
-# pl.legend(loc='best', bbox_to_anchor=(1.0, 1.0))
-# pl.savefig('waveform.png')
+if not LabPython:
+    import pylab as pl
+    ntimes = len(result[0])
+    times = numpy.linspace(0, (ntimes-1) / rate, ntimes)
+    for i in range(len(result)):
+        pl.plot(times, result[i], label='Ch %d' %(i))
+    # pl.legend(loc='best', bbox_to_anchor=(1.0, 1.0))
+    pl.savefig('waveform.png')
 
 
