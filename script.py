@@ -67,14 +67,14 @@ def parsesetting(conf, rate, totalt, loopnum):
             try:
                 funcshape = funcchoose[special[i]]
             except KeyError:
-                raise NotImplemented
+                raise NotImplementedError("Time dependence: %d" %special[i])
 
             if funcshape == 'adiabatic':
-                raise NotImplemented
+                raise NotImplementedError("Adiabatic time dependence")
             elif funcshape == 'exponential':
-                raise NotImplemented
+                raise NotImplementedError("Exponential time dependence")
             elif funcshape == 'sine':
-                raise NotImplemented
+                raise NotImplementedError("Sine time dependence")
             elif funcshape == 'linear':
                 vals = (vthis - vprev) * tsteps / timescale + vprev
             else:
