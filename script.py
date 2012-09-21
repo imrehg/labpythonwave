@@ -79,7 +79,11 @@ def parsesetting(conf, rate, loopnum):
                 a = (A - B) / timescale
                 vals = 1 / (A - a * tsteps)**2
             elif funcshape == 'exponential':
-                raise NotImplementedError("Exponential time dependence")
+                timeconstant = reserve[i][0] / 1000  # it is in ms
+                if vthis < vprev:
+                    vals = numpy.max([vprev * numpy.exp(-tsteps/timeconstant), [vthis] * (intervals+1)], axis=0)
+                else:
+                    vals = numpy.min([vprev * numpy.exp(tsteps/timeconstant), [vthis] * len(tsteps)], axis=0)
             elif funcshape == 'sine':
                 params = reserve[i]
 
